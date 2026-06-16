@@ -333,6 +333,23 @@ export default function App() {
   });
   const scrollRef = useRef(null);
   const u = useCallback((p) => setD((prev) => ({ ...prev, ...p })), []);
+  useEffect(() => {
+    const post = () => {
+      const h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight
+      );
+      window.parent.postMessage({ type: "mav-height", height: h }, "*");
+    };
+    post();
+    window.addEventListener("load", post);
+    const ro = new ResizeObserver(post);
+    ro.observe(document.body);
+    return () => {
+      window.removeEventListener("load", post);
+      ro.disconnect();
+    };
+  }, []);
 
   // Generation counter (localStorage)
   const getGenCount = () => { try { return parseInt(localStorage.getItem("mav_gen_count") || "0"); } catch { return 0; } };
